@@ -11,10 +11,10 @@ LABEL maintainer "Michael Baudino <michael.baudino@alpine-lab.com>"
 ENV LANG="C.UTF-8"
 
 # Define dependencies base versions
-ENV RUBYGEMS_VERSION="3.3.5" \
-    BUNDLER_VERSION="2.3.5" \
+ENV RUBYGEMS_VERSION="3.4.5" \
+    BUNDLER_VERSION="2.4.5" \
     NODE_VERSION="16" \
-    GOSU_VERSION="1.14"
+    GOSU_VERSION="1.16"
 
 # Define some default variables
 ENV PORT="5000" \
@@ -81,7 +81,7 @@ RUN set -eux; \
           ;; \
         esac; \
         \
-        # Add PostgreSQL APT reposiroty
+        # Add PostgreSQL APT repository
         curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg; \
         case ${debianReleaseCodename} in \
           jessie) echo "deb https://apt-archive.postgresql.org/pub/repos/apt ${debianReleaseCodename}-pgdg-archive main" ;; \
@@ -95,28 +95,24 @@ RUN set -eux; \
           *) echo "deb https://deb.nodesource.com/node_${NODE_VERSION}.x ${debianReleaseCodename} main" ;; \
         esac > /etc/apt/sources.list.d/nodesource.list; \
         \
-        # Add Yarn APT repository
-        curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.yarnpkg.com.gpg; \
-        echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list; \
-        \
-        # Add Heroku APT repository
-        curl -sSL https://cli-assets.heroku.com/apt/release.key | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.heroku.com.gpg; \
-        echo "deb https://cli-assets.heroku.com/branches/stable/apt ./" > /etc/apt/sources.list.d/heroku.list; \
-        \
         # Install everything
         apt-get update; \
         apt-get install --assume-yes --no-install-recommends --no-install-suggests \
-          heroku \
           jq \
           nano \
           nodejs \
           postgresql-client \
           vim \
-          yarn \
         ; \
         \
         # Cleanup
         rm -rf /var/lib/apt/lists/*; \
+        \
+        # Install Yarn (via NPM)
+        npm install --global yarn; \
+        \
+        # Install Heroku CLI (standalone tarball)
+        curl -sSL curl https://cli-assets.heroku.com/install.sh | sh; \
       ;; \
     esac;
 
