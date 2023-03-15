@@ -144,9 +144,7 @@ RUN set -eux; \
     [ "${osType}" = "alpine" ] && apk add --no-cache --virtual .gosu-deps gnupg || :; \
     \
     # Fetch author public key
-    for keyserver in $(shuf -e keys.gnupg.net ha.pool.sks-keyservers.net hkp://p80.pool.sks-keyservers.net:80 keyserver.ubuntu.com pgp.mit.edu); do \
-      gpg --batch --no-tty --keyserver "${keyserver}" --recv-keys "B42F6819007F00F88E364FD4036A9C25BF357DD4" && break || :; \
-    done; \
+    gpg --batch --fetch-keys https://keys.openpgp.org/vks/v1/by-fingerprint/B42F6819007F00F88E364FD4036A9C25BF357DD4; \
     \
     # Download binary
     curl -sSL -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-${TARGETARCH}"; \
